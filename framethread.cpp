@@ -3,34 +3,41 @@
 FrameThread::FrameThread(Mat frame, int index, QObject *parent) : QThread(parent)
 {
     m_current = new ProcessedFrame(frame, index, vector<vector<Point>>(), this);
-    m_pMOG2 = createBackgroundSubtractorMOG2(150,32,true);
+    int numOfLanes = ObjectDetector::getInstance()->numOfLanes();
+
+    for(int i = 0; i < numOfLanes; i++)
+        m_threads.append(new LaneThread(frame,i, this));
+
+    foreach (LaneThread *thread, m_threads)
+        connect(thread, SIGNAL(finished()),
+                this, SLOT(laneThreadHasFinished()));
 }
 
 void FrameThread::run()
 {
     m_current->clear();
-    // Morphology kernel. Possible shapes are: MORP_CORSS, MORPH_ELLIPSE and MORPH_RECT
-    Mat kernel = getStructuringElement(MORPH_CROSS, Size(7, 7));
-    //Process Frame
-    Mat frame = m_current->frame();
-    Mat diff;
-    diff = frame.clone();
-    // Blur for less noise
-    blur(diff, diff, Size(4, 4) );
-    // Background subtraction
-    m_pMOG2->apply(diff, diff);
-    // Morphology Process
-    morphologyEx(diff, diff, CV_MOP_CLOSE, kernel);    // Fill any small holes
-    morphologyEx(diff, diff, CV_MOP_OPEN, kernel);     // Remove noise
-    morphologyEx(diff, diff, CV_MOP_DILATE, kernel);   // Dilate to merge adjacent blobs...
-    // Binarize to delete shadows
-    threshold(diff, diff, 120, 255, CV_THRESH_BINARY);
-    // Find countours
-    vector<vector<Point> > contours;
-    findContours(diff, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+    m_checkCount = 0;
+    foreach (LaneThread *thread, m_threads)
+        thread->start();
+}
 
-    m_current->setFrame(frame);
-    m_current->setContours(contours);
+void FrameThread::laneThreadHasFinished()
+{
+    LaneThread *thread = (LaneThread *)sender();
+
+    qDebug() << m_current->index() << thread->laneIndex() << "T ::" << m_checkCount << "MAX ::" << ObjectDetector::getInstance()->numOfLanes() << "FT ::" << this;
+
+    ProcessedFrame *pf = thread->processedFrame();
+    foreach (vector<Point> v, pf->contours()) {
+        m_current->contours().push_back(v);
+    }
+
+    qDebug() << "CONTOURS ::" << m_current->contours().size();
+
+    if(m_checkCount ==  m_threads.size() - 1)
+        emit frameThreadHasFinished();
+
+    ++m_checkCount;
 }
 
 ProcessedFrame *FrameThread::current() const
@@ -41,5 +48,7 @@ ProcessedFrame *FrameThread::current() const
 void FrameThread::process(Mat frame, int index)
 {
     m_current = new ProcessedFrame(frame,index,vector<vector<Point>>(), this);
+    foreach (LaneThread *thread, m_threads)
+        thread->setProcessedFrame(m_current);
     start();
 }

@@ -16,14 +16,20 @@ SOURCES += \
     processedframe.cpp \
     framethread.cpp \
     framemanager.cpp \
-    controller.cpp
+    controller.cpp \
+    objectdetector.cpp \
+    lane.cpp \
+    lanethread.cpp
 
 HEADERS += \
     processedframe.h \
     framethread.h \
     framemanager.h \
-    controller.h
+    controller.h \
+    objectdetector.h \
+    lane.h \
+    lanethread.h
 
 INCLUDEPATH += /usr/include/opencv2
 INCLUDEPATH += /usr/local/include/opencv2
-LIBS += -lopencv_core -lopencv_videoio -lopencv_imgcodecs -lopencv_highgui -lopencv_video -lopencv_imgproc
+LIBS += -lopencv_core -lopencv_videoio -lopencv_imgcodecs -lopencv_highgui -lopencv_video -lopencv_imgproc -lopencv_objdetect

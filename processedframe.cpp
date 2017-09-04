@@ -15,8 +15,7 @@ ProcessedFrame::ProcessedFrame(Mat frame, int index, vector<vector<Point> > cont
     }
 }
 
-Mat ProcessedFrame::frame() const
-{
+Mat ProcessedFrame::frame(){
     return m_frame;
 }
 
@@ -25,7 +24,7 @@ int ProcessedFrame::index() const
     return m_index;
 }
 
-vector<vector<Point> > ProcessedFrame::contours() const
+vector<vector<Point> > ProcessedFrame::contours()
 {
     return m_contours;
 }

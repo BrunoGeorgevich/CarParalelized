@@ -19,10 +19,10 @@ class ProcessedFrame : public QObject
     Q_OBJECT
 public:
     explicit ProcessedFrame(ProcessedFrame *pf, QObject *parent = nullptr);
-    ProcessedFrame(Mat frame, int index, vector<vector<Point>> contours, QObject *parent = nullptr);
-    Mat frame() const;
+    ProcessedFrame(Mat frame, int index = 0, vector<vector<Point>> contours = vector<vector<Point>>(), QObject *parent = nullptr);
+    Mat frame();
     int index() const;
-    vector<vector<Point> > contours() const;
+    vector<vector<Point> > contours();
     void setContours(const vector<vector<Point> > &contours);
     void setFrame(const Mat &frame);
     void setIndex(int index);

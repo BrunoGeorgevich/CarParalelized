@@ -16,7 +16,7 @@ void FrameManager::processFrame(Mat frame, int index)
 
     FrameThread *ft = m_threads.first();
     m_threads.removeFirst();
-    connect(ft, SIGNAL(finished()),
+    connect(ft, SIGNAL(frameThreadHasFinished()),
             this, SLOT(processFrameHasFinished()));
     ft->process(frame, index);
 }
@@ -31,7 +31,7 @@ void FrameManager::init()
 void FrameManager::processFrameHasFinished()
 {
     FrameThread *ft = (FrameThread *)sender();
-    disconnect(ft, SIGNAL(finished()),
+    disconnect(ft, SIGNAL(frameThreadHasFinished()),
             this, SLOT(processFrameHasFinished()));
     ProcessedFrame *pf = ft->current();
     emit newProcessedFrame(pf);
