@@ -10,14 +10,13 @@ class FrameThread : public QThread
 {
     Q_OBJECT
 public:
-    FrameThread(Mat frame, int index, int test, QObject *parent = nullptr);
+    FrameThread(Mat frame, int index, QObject *parent = nullptr);
     ProcessedFrame *current() const;
     void process(Mat frame, int index);
 protected:
     void run();
 private:
     ProcessedFrame *m_current;
-    int m_test;
     Ptr< BackgroundSubtractor> m_pMOG2;
 };
 
