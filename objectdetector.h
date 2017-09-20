@@ -17,19 +17,20 @@ public:
     void addNewLane(Point lineP1, Point lineP2, Rect toTrack, String name="");
 
     void drawLanes(ProcessedFrame *pf);
-    void genContours(const int laneIndex, Mat &frame, ProcessedFrame *pf);
-    void genContours(const int laneIndex, ProcessedFrame *pf);
+    vector<vector<Point> > genContours(const int laneIndex, Mat frame, Mat frame2);
+    vector<vector<Point> > genContours(const int laneIndex, Mat frame);
     void analyzeContours(const int laneIndex, ProcessedFrame *pf);
     int numOfLanes();
 
     static ObjectDetector *getInstance();
 private:
     static ObjectDetector *m_instance;
+
     ObjectDetector(int history, int threshold, bool shadow);
     Mat frame, diff;
 
     // BGS variables
-    Ptr< BackgroundSubtractor> pMOG2;
+    Ptr<BackgroundSubtractor> pMOG2;
 
     // Contour variables
     int minContourSize;
@@ -43,8 +44,6 @@ private:
     Mat kernelClose;
     Mat kernelOpen;
     Mat kernelDilate;
-
-
 };
 
 #endif // OBJECTDETECTOR_H

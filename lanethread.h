@@ -8,16 +8,19 @@
 
 class LaneThread : public QThread
 {
+    Q_OBJECT
 public:
     LaneThread(Mat frame, int laneIndex, QObject *parent);
-    void setProcessedFrame(ProcessedFrame *pf);
-    ProcessedFrame *processedFrame() const;
     int laneIndex() const;
-
+    Mat frame() const;
+    void setFrame(Mat frame);
+signals:
+    void contoursCalculated(Contours *);
 protected:
-    ProcessedFrame *m_pf;
-    int m_laneIndex;
     void run();
+private:
+    Mat m_frame;
+    int m_laneIndex;
 };
 
 #endif // LANETHREAD_H

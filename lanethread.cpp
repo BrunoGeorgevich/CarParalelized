@@ -2,20 +2,8 @@
 
 LaneThread::LaneThread(Mat frame, int laneIndex, QObject *parent) : QThread(parent)
 {
-    m_pf = new ProcessedFrame(frame);
-    m_pf->setParent(this);
-
+    m_frame = frame;
     m_laneIndex = laneIndex;
-}
-
-void LaneThread::setProcessedFrame(ProcessedFrame *pf)
-{
-    m_pf = pf;
-}
-
-ProcessedFrame *LaneThread::processedFrame() const
-{
-    return m_pf;
 }
 
 int LaneThread::laneIndex() const
@@ -25,6 +13,21 @@ int LaneThread::laneIndex() const
 
 void LaneThread::run()
 {
+    qDebug() << "A" << m_laneIndex;
     ObjectDetector *detector = ObjectDetector::getInstance();
-    detector->genContours(m_laneIndex, m_pf);
+    qDebug() << "B" << m_laneIndex;
+    Contours *c = new Contours(detector->genContours(m_laneIndex, m_frame));
+    qDebug() << "C" << m_laneIndex;
+    contoursCalculated(c);
+    qDebug() << "D" << m_laneIndex;
+}
+
+Mat LaneThread::frame() const
+{
+    return m_frame;
+}
+
+void LaneThread::setFrame(Mat frame)
+{
+    m_frame = frame;
 }

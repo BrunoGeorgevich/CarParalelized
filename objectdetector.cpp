@@ -34,33 +34,12 @@ void ObjectDetector::drawLanes(ProcessedFrame *pf)
     }
 }
 
-void ObjectDetector::genContours(const int laneIndex, Mat &frame, ProcessedFrame *pf)
+vector<vector<Point>> ObjectDetector::genContours(const int laneIndex, Mat frame, Mat frame2)
 {
     Mat fg, diff;
-    subtract(frame, pf->frame(), diff);
+    subtract(frame, frame2, diff);
     // Transform ROI to grayscale
     cvtColor(diff(lanes[laneIndex].toTrack), fg, CV_BGR2GRAY);
-    // Apply background subtraction
-    //pMOG2->apply(fg, fg, .75);
-    // Morphology Process
-    blur(fg, fg, Size(3,3));
-//  morphologyEx(fg, fg, MORPH_OPEN, kernelOpen, kernelOrigin );  // Remove noise
-    morphologyEx(fg, fg, MORPH_CLOSE, kernelClose, kernelOrigin); // Close small gaps
-    morphologyEx(fg, fg, MORPH_DILATE, kernelDilate, kernelOrigin);   // Dilate to merge adjacent blobs...
-    // Binarize to delete shadows
-    blur(fg, fg, Size(3,3));
-    threshold(fg, fg, 10, 255, CV_THRESH_BINARY);
-    // Generate the contours vector
-    vector<vector<Point>> contours;
-    findContours(fg, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
-    pf->setContours(contours);
-}
-
-void ObjectDetector::genContours(const int laneIndex, ProcessedFrame *pf)
-{
-    Mat fg;
-    // Transform ROI to grayscale
-    fg = pf->frame()(lanes[laneIndex].toTrack).clone();
     // Apply background subtraction
     pMOG2->apply(fg, fg, .75);
     // Morphology Process
@@ -74,7 +53,28 @@ void ObjectDetector::genContours(const int laneIndex, ProcessedFrame *pf)
     // Generate the contours vector
     vector<vector<Point>> contours;
     findContours(fg, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
-    pf->setContours(contours);
+    return contours;
+}
+
+vector<vector<Point>> ObjectDetector::genContours(const int laneIndex, Mat frame)
+{
+    Mat fg;
+    // Transform ROI to grayscale
+    fg = frame(lanes[laneIndex].toTrack).clone();
+    // Apply background subtraction
+    pMOG2->apply(fg, fg, .75);
+    // Morphology Process
+    blur(fg, fg, Size(3,3));
+//  morphologyEx(fg, fg, MORPH_OPEN, kernelOpen, kernelOrigin );  // Remove noise
+    morphologyEx(fg, fg, MORPH_CLOSE, kernelClose, kernelOrigin); // Close small gaps
+    morphologyEx(fg, fg, MORPH_DILATE, kernelDilate, kernelOrigin);   // Dilate to merge adjacent blobs...
+//    // Binarize to delete shadows
+    blur(fg, fg, Size(3,3));
+    threshold(fg, fg, 10, 255, CV_THRESH_BINARY);
+    // Generate the contours vector
+    vector<vector<Point>> contours;
+//    findContours(fg, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+    return contours;
 }
 
 void ObjectDetector::analyzeContours(const int laneIndex, ProcessedFrame *pf)
@@ -85,7 +85,7 @@ void ObjectDetector::analyzeContours(const int laneIndex, ProcessedFrame *pf)
     // Region of interest from image
     Mat to_track = pf->frame()(lane->toTrack);
 
-    vector<vector<Point>> contours = pf->contours();
+    vector<vector<Point>> contours = pf->contours()->data();
     // Check intersections
     for( size_t i = 0; i < contours.size(); ++i)
     {

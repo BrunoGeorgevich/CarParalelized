@@ -13,16 +13,16 @@ public:
     FrameThread(Mat frame, int index, QObject *parent = nullptr);
     ProcessedFrame *current() const;
     void process(Mat frame, int index);
-signals:
-    void frameThreadHasFinished();
 protected:
     void run();
 private slots:
-    void laneThreadHasFinished();
+    void laneThreadHasFinished(Contours *contours);
 private:
     QList<LaneThread *> m_threads;
     ProcessedFrame *m_current;
     int m_checkCount;
+
+    bool isFinished();
 };
 
 #endif // FRAMETHREAD_H

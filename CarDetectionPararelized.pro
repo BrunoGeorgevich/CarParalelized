@@ -19,7 +19,8 @@ SOURCES += \
     controller.cpp \
     objectdetector.cpp \
     lane.cpp \
-    lanethread.cpp
+    lanethread.cpp \
+    contours.cpp
 
 HEADERS += \
     processedframe.h \
@@ -28,7 +29,8 @@ HEADERS += \
     controller.h \
     objectdetector.h \
     lane.h \
-    lanethread.h
+    lanethread.h \
+    contours.h
 
 INCLUDEPATH += /usr/include/opencv2
 INCLUDEPATH += /usr/local/include/opencv2
